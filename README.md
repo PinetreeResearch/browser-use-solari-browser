@@ -162,6 +162,10 @@ curl -X POST https://api.browser-use.com/api/v4/runs \
 
 ## Integrations, hosting, custom tools, MCP, and more on our [Docs ↗](https://docs.browser-use.com)
 
+### Solari Browser integration
+
+This fork includes a maintained [Browser Use × Solari Browser example](examples/integrations/solari/) that runs the open-source agent on a Solari-managed Chrome session over CDP. It supports fast or stealth browsers, persistent Solari profiles, and native session recording without changing Browser Use core code.
+
 <br/>
 
 # FAQ
