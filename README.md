@@ -166,6 +166,57 @@ curl -X POST https://api.browser-use.com/api/v4/runs \
 
 This fork includes a maintained [Browser Use × Solari Browser example](examples/integrations/solari/) that runs the open-source agent on a Solari-managed Chrome session over CDP. It supports fast or stealth browsers, persistent Solari profiles, and native session recording without changing Browser Use core code.
 
+#### Quickstart
+
+Clone this fork and install Browser Use from source:
+
+```bash
+git clone https://github.com/PinetreeResearch/browser-use-solari-browser.git
+cd browser-use-solari-browser
+uv sync
+```
+
+Set the Browser Use model key and the Solari infrastructure key:
+
+```bash
+export BROWSER_USE_API_KEY='...'
+export SOLARI_API_KEY='...'
+```
+
+Run the example with the default task:
+
+```bash
+uv run --with solari-browser==0.1.2 \
+  python examples/integrations/solari/browser_use_solari.py
+```
+
+The example creates a Solari-managed Chrome session, passes its signed CDP endpoint directly to Browser Use, runs the open-source Browser Use agent with `ChatBrowserUse()`, and releases the remote browser even if the task fails. Neither API keys nor the signed endpoint are printed.
+
+Provide any browser task through `BROWSER_USE_TASK` and optionally limit its steps:
+
+```bash
+export BROWSER_USE_TASK='Open https://example.com and report the page heading.'
+export BROWSER_USE_MAX_STEPS=10
+
+uv run --with solari-browser==0.1.2 \
+  python examples/integrations/solari/browser_use_solari.py
+```
+
+The default Solari fast browser is best when recording is not needed. Native Solari recording requires a stealth browser:
+
+```bash
+export SOLARI_STEALTH=true
+export SOLARI_RECORDING=true
+export SOLARI_RECORDING_PATH='solari-recording.rrweb.ndjson.gz'
+
+uv run --with solari-browser==0.1.2 \
+  python examples/integrations/solari/browser_use_solari.py
+```
+
+After the session is released, the example downloads the native rrweb replay to `SOLARI_RECORDING_PATH`. Set `SOLARI_PROFILE_ID` to reuse a persistent Solari browser profile, or `SOLARI_REGION` to select a supported region.
+
+See the [complete Solari integration guide](examples/integrations/solari/README.md) for all environment variables, alternative Browser Use models, security notes, and the upstream update workflow.
+
 <br/>
 
 # FAQ
