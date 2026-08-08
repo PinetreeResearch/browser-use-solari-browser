@@ -74,7 +74,11 @@ Keep Solari-specific changes isolated to this directory so upstream Browser Use 
 ```bash
 git fetch upstream
 git checkout main
-git merge --ff-only upstream/main  # when the fork has no local commits to merge
+git merge upstream/main
+uv run pre-commit run --files \
+  examples/integrations/solari/README.md \
+  examples/integrations/solari/browser_use_solari.py
+git push origin main
 ```
 
-When the Solari example adds commits on top of upstream, merge or rebase those commits after fetching and rerun the example smoke test before publishing.
+Resolve any merge conflicts in the isolated Solari example, then rerun the real example smoke test before publishing. GitHub's **Sync fork** button can also pull upstream changes when there are no conflicts.
