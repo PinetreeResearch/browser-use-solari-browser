@@ -1,7 +1,9 @@
 <!-- mcp-name: com.browser-use/browser-use -->
 > [!IMPORTANT]
-> **Browser Use × Solari Browser**  
-> This PinetreeResearch-maintained fork runs the open-source Browser Use agent on Solari-managed Chrome through CDP, with support for persistent profiles, stealth browsers, and native session recording.  
+> **Browser Use × Solari Browser**
+>
+> This PinetreeResearch-maintained fork runs the open-source Browser Use agent on Solari-managed Chrome through CDP, with support for persistent profiles, stealth browsers, and native session recording.
+>
 > **[View the Solari quickstart →](#solari-browser-integration)**
 
 <picture>
