@@ -2,6 +2,7 @@
 
 import asyncio
 import gzip
+import math
 import os
 import time
 from pathlib import Path
@@ -43,15 +44,35 @@ async def download_recording(client: Solari, session_id: str, output: Path, *, t
 			await asyncio.sleep(1)
 
 
+async def enable_captcha_waiting(browser: Browser) -> None:
+	"""Subscribe after Browser Use has registered its CAPTCHA watchdog."""
+	await browser.cdp_client.send_raw('Solari.enableCaptchaEvents')
+
+
 async def main() -> None:
 	api_key = os.getenv('SOLARI_API_KEY', '').strip()
 	if not api_key:
 		raise RuntimeError('SOLARI_API_KEY is required.')
 
 	stealth = env_flag('SOLARI_STEALTH')
+	captcha = env_flag('SOLARI_CAPTCHA')
 	recording = env_flag('SOLARI_RECORDING')
+	if captcha and not stealth:
+		raise RuntimeError('CAPTCHA waiting requires SOLARI_STEALTH=true.')
 	if recording and not stealth:
 		raise RuntimeError('Native Solari recording requires SOLARI_STEALTH=true.')
+	step_timeout = 180
+	if captcha:
+		# Browser Use otherwise waits 120s; Solari allows a 200s solver request
+		# plus injection. Preserve an explicitly configured customer timeout.
+		if not os.getenv('TIMEOUT_CaptchaSolverWait'):
+			os.environ['TIMEOUT_CaptchaSolverWait'] = '240'
+		wait_timeout = float(os.environ['TIMEOUT_CaptchaSolverWait'])
+		if not math.isfinite(wait_timeout) or wait_timeout < 0:
+			raise ValueError('TIMEOUT_CaptchaSolverWait must be a finite, non-negative number.')
+		# The wait runs inside Agent's outer per-step timeout, which otherwise
+		# expires at 180s. Leave the normal 180s work budget after waiting.
+		step_timeout += math.ceil(wait_timeout)
 
 	client = Solari(
 		api_key=api_key,
@@ -65,10 +86,14 @@ async def main() -> None:
 		session = await client.sessions.create(
 			profile_id=os.getenv('SOLARI_PROFILE_ID') or None,
 			stealth=stealth,
+			captcha=captcha,
 			recording=recording,
 		)
 		# The signed CDP endpoint is passed directly to Browser Use and is never logged.
 		browser = Browser(cdp_url=session.cdp_endpoint, keep_alive=True)
+		if captcha:
+			await browser.start()
+			await enable_captcha_waiting(browser)
 		agent = Agent(
 			task=os.getenv(
 				'BROWSER_USE_TASK',
@@ -76,6 +101,7 @@ async def main() -> None:
 			),
 			llm=ChatBrowserUse(),
 			browser=browser,
+			step_timeout=step_timeout,
 		)
 		history = await agent.run(max_steps=int(os.getenv('BROWSER_USE_MAX_STEPS', '10')))
 		print(history.final_result())

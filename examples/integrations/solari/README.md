@@ -36,6 +36,8 @@ The example creates one Solari Browser session, passes its signed CDP endpoint d
 | `SOLARI_BASE_URL` | SDK default | Optional alternate API endpoint |
 | `SOLARI_PROFILE_ID` | unset | Optional persistent Solari browser profile |
 | `SOLARI_STEALTH` | `false` | Use a stealth browser |
+| `SOLARI_CAPTCHA` | `false` | Enable CAPTCHA solving and Browser Use's CAPTCHA waiting on a stealth browser |
+| `TIMEOUT_CaptchaSolverWait` | `240` when CAPTCHA is enabled | Maximum CAPTCHA wait in seconds; an explicit value is preserved |
 | `SOLARI_RECORDING` | `false` | Request a native rrweb session recording |
 | `SOLARI_RECORDING_PATH` | `solari-recording.rrweb.ndjson.gz` | Recording output path |
 
@@ -49,6 +51,21 @@ uv run --with solari-browser==0.1.2 \
 ```
 
 After session release, the example waits for the replay and saves a gzipped rrweb event stream.
+
+## CAPTCHA solving
+
+Enable both flags to request a solver and let the agent wait for it:
+
+```bash
+export SOLARI_STEALTH=true
+export SOLARI_CAPTCHA=true
+uv run --with solari-browser==0.1.2 \
+  python examples/integrations/solari/browser_use_solari.py
+```
+
+This requires a Solari pool that supports the `Solari.enableCaptchaEvents` CDP command. The example enables events after Browser Use connects and registers its CAPTCHA watchdog. The pool replays any ongoing solve, then emits `BrowserUse.captchaSolverStarted` and `BrowserUse.captchaSolverFinished`. Concurrent solves keep the agent waiting until all have finished. A successful event means the token was applied or the press-and-hold widget cleared; it does not guarantee that the website accepted the session.
+
+The 240-second wait covers Solari's 200-second solver request budget plus token injection. Set `TIMEOUT_CaptchaSolverWait` to override it. The example also adds that wait budget to the agent's normal 180-second step timeout (420 seconds by default), so the outer timeout does not cancel an ongoing wait. The pool's independent CDP action safeguards remain active during a solve. Solver credits and provider support are still required; these flags do not bypass every anti-bot block.
 
 ## Use another Browser Use model
 
