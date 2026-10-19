@@ -193,7 +193,7 @@ export SOLARI_API_KEY='...'
 Run the example with the default task:
 
 ```bash
-uv run --with solari-browser==0.1.2 \
+uv run --with solari-browser==0.2.1 \
   python examples/integrations/solari/browser_use_solari.py
 ```
 
@@ -205,7 +205,7 @@ Provide any browser task through `BROWSER_USE_TASK` and optionally limit its ste
 export BROWSER_USE_TASK='Open https://example.com and report the page heading.'
 export BROWSER_USE_MAX_STEPS=10
 
-uv run --with solari-browser==0.1.2 \
+uv run --with solari-browser==0.2.1 \
   python examples/integrations/solari/browser_use_solari.py
 ```
 
@@ -216,7 +216,7 @@ export SOLARI_STEALTH=true
 export SOLARI_RECORDING=true
 export SOLARI_RECORDING_PATH='solari-recording.rrweb.ndjson.gz'
 
-uv run --with solari-browser==0.1.2 \
+uv run --with solari-browser==0.2.1 \
   python examples/integrations/solari/browser_use_solari.py
 ```
 
