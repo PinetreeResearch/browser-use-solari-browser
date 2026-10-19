@@ -20,7 +20,7 @@ export SOLARI_API_KEY='...'
 Run the example:
 
 ```bash
-uv run --with solari-browser==0.1.2 \
+uv run --with solari-browser==0.2.1 \
   python examples/integrations/solari/browser_use_solari.py
 ```
 
@@ -46,7 +46,7 @@ The default fast browser is appropriate when recording is not needed. Native Sol
 ```bash
 export SOLARI_STEALTH=true
 export SOLARI_RECORDING=true
-uv run --with solari-browser==0.1.2 \
+uv run --with solari-browser==0.2.1 \
   python examples/integrations/solari/browser_use_solari.py
 ```
 
@@ -59,7 +59,7 @@ Enable both flags to request a solver and let the agent wait for it:
 ```bash
 export SOLARI_STEALTH=true
 export SOLARI_CAPTCHA=true
-uv run --with solari-browser==0.1.2 \
+uv run --with solari-browser==0.2.1 \
   python examples/integrations/solari/browser_use_solari.py
 ```
 
